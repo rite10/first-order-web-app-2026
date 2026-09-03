@@ -2,7 +2,6 @@ package com.capgemini.productservice.service;
 
 import java.util.List;
 import org.springframework.stereotype.Service;
-
 import com.capgemini.productservice.entity.Product;
 import com.capgemini.productservice.repo.ProductRepository;
 
@@ -17,15 +16,23 @@ public class ProductService implements ProductServiceInf {
 
 
     @Override
-    public List<Product> getOrder() {
+    public List<Product> getAllProduct() {
         List<Product> order= repository.findAll();
         return order;
     }
 
 
     @Override
-    public void addOrder(Product order) {
+    public void addProduct(Product order) {
         repository.save(order);
     }
+
+    @Override
+    public Product fetchProductById(Long id) {
+
+    return repository.findById(id)
+            .orElseThrow(() ->
+                    new RuntimeException("Product not found with id: " + id));
+}
     
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,17 +24,18 @@ public class OrderController {
         this.orderService = orderService;
     }
 
-    @GetMapping("/getAll")
-    public ResponseEntity<List<Order>> getOrderDetails(){
-     List<Order> orders=orderService.getOrder();
-     return new ResponseEntity<>(orders,HttpStatus.OK);
-    }
 
-    @PostMapping("/created")
+    @PostMapping("/saveOrder")
     public ResponseEntity<String> createOrder(@RequestBody Order order){
         orderService.addOrder(order);
         Long id=order.getId();
         return new ResponseEntity<>("Order has created with id "+ id ,HttpStatus.CREATED);
+    }
+
+     @GetMapping("/getOrders")
+    public ResponseEntity<List<Order>> getOrderDetails(){
+     List<Order> orders=orderService.getOrder();
+     return new ResponseEntity<>(orders,HttpStatus.OK);
     }
     
 }
