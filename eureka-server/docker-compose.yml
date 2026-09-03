@@ -1,0 +1,53 @@
+services:
+
+  eureka-server:
+    image: ${DOCKERHUB_USERNAME}/eureka-server:${IMAGE_TAG:-latest}
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    networks:
+      - microservices-net
+    restart: unless-stopped
+
+  product-service:
+    image: ${DOCKERHUB_USERNAME}/product-service:${IMAGE_TAG:-latest}
+    container_name: product-service
+    ports:
+      - "8082:8082"
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    depends_on:
+      - eureka-server
+    networks:
+      - microservices-net
+    restart: unless-stopped
+
+  order-service:
+    image: ${DOCKERHUB_USERNAME}/order-service:${IMAGE_TAG:-latest}
+    container_name: order-service
+    ports:
+      - "8081:8081"
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    depends_on:
+      - eureka-server
+    networks:
+      - microservices-net
+    restart: unless-stopped
+
+  payment-service:
+    image: ${DOCKERHUB_USERNAME}/payment-service:${IMAGE_TAG:-latest}
+    container_name: payment-service
+    ports:
+      - "8083:8083"
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    depends_on:
+      - eureka-server
+    networks:
+      - microservices-net
+    restart: unless-stopped
+
+networks:
+  microservices-net:
+    driver: bridge
