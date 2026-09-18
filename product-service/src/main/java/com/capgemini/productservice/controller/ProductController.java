@@ -40,6 +40,7 @@ public class ProductController {
     @GetMapping("/getProduct/{id}")
     public ResponseEntity<Product> getOrderById(@PathVariable Long id){
              Product product= productService.fetchProductById(id);
+             System.out.println("Tinni changes for webhoook test");
         return new ResponseEntity<>(product,HttpStatus.OK);
 
     }
