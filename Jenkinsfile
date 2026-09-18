@@ -14,13 +14,6 @@ pipeline {
 
     stages {
 
-        stage('Checkout') {
-            steps {
-                echo 'Checking out source code from GitHub...'
-                checkout scm
-            }
-        }
-
         stage('Maven Build') {
             steps {
                 echo 'Building all Spring Boot services...'
@@ -45,21 +38,15 @@ pipeline {
 
         stage('Docker Hub Login') {
             steps {
-                echo 'Logging in to Docker Hub...'
-
                 sh '''
-                    echo "$DOCKERHUB_CREDENTIALS_PSW" | \
-                    docker login \
-                    -u "$DOCKERHUB_CREDENTIALS_USR" \
-                    --password-stdin
+                    echo "$DOCKERHUB_CREDENTIALS_PSW" |
+                    docker login -u "$DOCKERHUB_CREDENTIALS_USR" --password-stdin
                 '''
             }
         }
 
         stage('Docker Push') {
             steps {
-                echo 'Pushing images to Docker Hub...'
-
                 sh 'docker push "$DOCKERHUB_CREDENTIALS_USR/eureka-server:$IMAGE_TAG"'
                 sh 'docker push "$DOCKERHUB_CREDENTIALS_USR/product-service:$IMAGE_TAG"'
                 sh 'docker push "$DOCKERHUB_CREDENTIALS_USR/order-processing-service:$IMAGE_TAG"'
@@ -78,7 +65,7 @@ pipeline {
         }
 
         failure {
-            echo 'Pipeline failed. Check the failed stage in Console Output.'
+            echo 'Pipeline failed.'
         }
     }
 }
