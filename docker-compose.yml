@@ -1,0 +1,36 @@
+services:
+
+  eureka-server:
+    image: riteshpradhan198/eureka-server:${IMAGE_TAG}
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    restart: unless-stopped
+
+  product-service:
+    image: riteshpradhan198/product-service:${IMAGE_TAG}
+    container_name: product-service
+    ports:
+      - "8082:8082"
+    depends_on:
+      - eureka-server
+    restart: unless-stopped
+
+  order-processing-service:
+    image: riteshpradhan198/order-processing-service:${IMAGE_TAG}
+    container_name: order-processing-service
+    ports:
+      - "8081:8081"
+    depends_on:
+      - eureka-server
+      - product-service
+    restart: unless-stopped
+
+  payment-service:
+    image: riteshpradhan198/payment-service:${IMAGE_TAG}
+    container_name: payment-service
+    ports:
+      - "8083:8083"
+    depends_on:
+      - eureka-server
+    restart: unless-stopped
