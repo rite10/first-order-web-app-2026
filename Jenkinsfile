@@ -27,12 +27,13 @@ pipeline {
 
         stage('Docker Build') {
             steps {
-                echo "Building Docker images with tag ${IMAGE_TAG}..."
+                sh 'docker build -t "$DOCKERHUB_CREDENTIALS_USR/eureka-server:$IMAGE_TAG" -t "$DOCKERHUB_CREDENTIALS_USR/eureka-server:latest" eureka-server'
 
-                sh 'docker build -t "$DOCKERHUB_CREDENTIALS_USR/eureka-server:$IMAGE_TAG" eureka-server'
-                sh 'docker build -t "$DOCKERHUB_CREDENTIALS_USR/product-service:$IMAGE_TAG" product-service'
-                sh 'docker build -t "$DOCKERHUB_CREDENTIALS_USR/order-processing-service:$IMAGE_TAG" order-processing-service'
-                sh 'docker build -t "$DOCKERHUB_CREDENTIALS_USR/payment-service:$IMAGE_TAG" payment-service'
+                sh 'docker build -t "$DOCKERHUB_CREDENTIALS_USR/product-service:$IMAGE_TAG" -t "$DOCKERHUB_CREDENTIALS_USR/product-service:latest" product-service'
+
+                sh 'docker build -t "$DOCKERHUB_CREDENTIALS_USR/order-processing-service:$IMAGE_TAG" -t "$DOCKERHUB_CREDENTIALS_USR/order-processing-service:latest" order-processing-service'
+
+                sh 'docker build -t "$DOCKERHUB_CREDENTIALS_USR/payment-service:$IMAGE_TAG" -t "$DOCKERHUB_CREDENTIALS_USR/payment-service:latest" payment-service'
             }
         }
 
@@ -48,9 +49,31 @@ pipeline {
         stage('Docker Push') {
             steps {
                 sh 'docker push "$DOCKERHUB_CREDENTIALS_USR/eureka-server:$IMAGE_TAG"'
+                sh 'docker push "$DOCKERHUB_CREDENTIALS_USR/eureka-server:latest"'
+
                 sh 'docker push "$DOCKERHUB_CREDENTIALS_USR/product-service:$IMAGE_TAG"'
+                sh 'docker push "$DOCKERHUB_CREDENTIALS_USR/product-service:latest"'
+
                 sh 'docker push "$DOCKERHUB_CREDENTIALS_USR/order-processing-service:$IMAGE_TAG"'
+                sh 'docker push "$DOCKERHUB_CREDENTIALS_USR/order-processing-service:latest"'
+
                 sh 'docker push "$DOCKERHUB_CREDENTIALS_USR/payment-service:$IMAGE_TAG"'
+                sh 'docker push "$DOCKERHUB_CREDENTIALS_USR/payment-service:latest"'
+            }
+        }
+
+        stage('Deploy to EC2') {
+            steps {
+                sh '''
+                    echo "Pulling latest images..."
+                    docker compose pull
+
+                    echo "Starting application..."
+                    docker compose up -d
+
+                    echo "Running containers:"
+                    docker compose ps
+                '''
             }
         }
     }
@@ -61,7 +84,7 @@ pipeline {
         }
 
         success {
-            echo 'Build and Docker image push completed successfully.'
+            echo 'Build, push and deployment completed successfully.'
         }
 
         failure {
